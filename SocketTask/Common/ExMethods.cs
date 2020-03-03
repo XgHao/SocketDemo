@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,6 +24,16 @@ namespace SocketTask.Common
 
             //滚动到该位置
             textBox.ScrollToCaret();
+        }
+
+        /// <summary>
+        /// 获取Socket的终结点IP地址
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <returns></returns>
+        public static string IPstr(this Socket socket)
+        {
+            return socket.RemoteEndPoint.ToString();
         }
     }
 }

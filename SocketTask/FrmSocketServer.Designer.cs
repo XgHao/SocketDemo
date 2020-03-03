@@ -128,6 +128,7 @@
             this.btn_Broke.TabIndex = 19;
             this.btn_Broke.Text = "关闭服务";
             this.btn_Broke.UseVisualStyleBackColor = true;
+            this.btn_Broke.Click += new System.EventHandler(this.Btn_Broke_Click);
             // 
             // btn_Start
             // 
@@ -145,20 +146,25 @@
             this.txt_LocalPort.Name = "txt_LocalPort";
             this.txt_LocalPort.Size = new System.Drawing.Size(144, 21);
             this.txt_LocalPort.TabIndex = 17;
+            this.txt_LocalPort.Text = "1232";
             // 
             // txt_PublicIP
             // 
             this.txt_PublicIP.Location = new System.Drawing.Point(694, 81);
             this.txt_PublicIP.Name = "txt_PublicIP";
+            this.txt_PublicIP.ReadOnly = true;
             this.txt_PublicIP.Size = new System.Drawing.Size(144, 21);
             this.txt_PublicIP.TabIndex = 16;
+            this.txt_PublicIP.Text = "正在努力获取中...";
             // 
             // txt_LocalIP
             // 
             this.txt_LocalIP.Location = new System.Drawing.Point(694, 37);
             this.txt_LocalIP.Name = "txt_LocalIP";
+            this.txt_LocalIP.ReadOnly = true;
             this.txt_LocalIP.Size = new System.Drawing.Size(144, 21);
             this.txt_LocalIP.TabIndex = 15;
+            this.txt_LocalIP.Text = "正在努力获取中...";
             // 
             // label1
             // 
@@ -224,6 +230,7 @@
             this.Controls.Add(this.lbl_LocalIP);
             this.Name = "FrmSocketServer";
             this.Text = "FrmSocketServer";
+            this.Shown += new System.EventHandler(this.FrmSocketServer_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();
 

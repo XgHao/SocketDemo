@@ -76,9 +76,6 @@ namespace SocketTask.Common
             {
                 textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{txt}{Environment.NewLine}{Environment.NewLine}");
             }
-
-            //滚动到文末
-            textBox.HoldBottom();
         }
     }
 }
