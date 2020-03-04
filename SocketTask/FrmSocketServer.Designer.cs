@@ -45,6 +45,7 @@
             this.lbl_PublicIP = new System.Windows.Forms.Label();
             this.lbl_LocalPort = new System.Windows.Forms.Label();
             this.lbl_LocalIP = new System.Windows.Forms.Label();
+            this.cb_All = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // Lbl_FilePath
@@ -80,6 +81,8 @@
             this.txt_Sender.Name = "txt_Sender";
             this.txt_Sender.Size = new System.Drawing.Size(445, 166);
             this.txt_Sender.TabIndex = 23;
+            this.txt_Sender.TextChanged += new System.EventHandler(this.Txt_Sender_TextChanged);
+            this.txt_Sender.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Txt_Sender_KeyUp);
             // 
             // txt_RecInfo
             // 
@@ -119,6 +122,7 @@
             this.btn_Sender.TabIndex = 21;
             this.btn_Sender.Text = "发送消息";
             this.btn_Sender.UseVisualStyleBackColor = true;
+            this.btn_Sender.Click += new System.EventHandler(this.Btn_Sender_Click);
             // 
             // btn_Broke
             // 
@@ -206,11 +210,26 @@
             this.lbl_LocalIP.TabIndex = 11;
             this.lbl_LocalIP.Text = "本机内网IP：";
             // 
+            // cb_All
+            // 
+            this.cb_All.AutoSize = true;
+            this.cb_All.BackColor = System.Drawing.SystemColors.Window;
+            this.cb_All.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.cb_All.Location = new System.Drawing.Point(787, 283);
+            this.cb_All.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
+            this.cb_All.Name = "cb_All";
+            this.cb_All.Size = new System.Drawing.Size(48, 16);
+            this.cb_All.TabIndex = 28;
+            this.cb_All.Text = "全选";
+            this.cb_All.UseVisualStyleBackColor = false;
+            this.cb_All.CheckedChanged += new System.EventHandler(this.Cb_All_CheckedChanged);
+            // 
             // FrmSocketServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(898, 521);
+            this.Controls.Add(this.cb_All);
             this.Controls.Add(this.Lbl_FilePath);
             this.Controls.Add(this.btn_SendFile);
             this.Controls.Add(this.btn_ChooseFile);
@@ -255,5 +274,6 @@
         private System.Windows.Forms.Label lbl_PublicIP;
         private System.Windows.Forms.Label lbl_LocalPort;
         private System.Windows.Forms.Label lbl_LocalIP;
+        private System.Windows.Forms.CheckBox cb_All;
     }
 }

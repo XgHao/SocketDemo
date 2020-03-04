@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -44,12 +45,12 @@ namespace SocketTask
             //验证IP地址和端口号
             if (!IPAddress.TryParse(txt_LocalIP.Text.Trim(), out IPAddress iPAddress))
             {
-                MessageBox.Show("请输入正确的IP地址", "提示");
+                this.Hint(txt_LocalIP, "请输入正确的IP地址", MyEnum.ShowPosition.Mid_Right);
                 return;
             }
             if (!int.TryParse(txt_LocalPort.Text.Trim(), out int port))
-            {
-                MessageBox.Show("请输入正确的端口号", "提示");
+            {   
+                this.Hint(txt_LocalPort, "请输入正确的端口号", MyEnum.ShowPosition.Mid_Right);
                 return;
             }
 
@@ -166,7 +167,6 @@ namespace SocketTask
         {
             IPAddress publicIP = null, localIP = null;
             
-
             //获取公网IP
             Task.Run(() =>
             {
@@ -228,6 +228,86 @@ namespace SocketTask
 
             btn_Start.Enabled = true;
             txt_RecInfo.AddTextWithInvoke("+++++++++++++++++服务已关闭+++++++++++++++++");
+        }
+
+        /// <summary>
+        /// 发送消息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_Sender_Click(object sender, EventArgs e)
+        {
+            if (txt_Sender.Text.Length <= 0) 
+            {
+                this.Hint(txt_Sender, "消息不能为空", MyEnum.ShowPosition.Mid_Mid);
+                return;
+            }
+
+            if (lb_OnlineList.SelectedItems.Count == 0) 
+            {
+                this.Hint(lb_OnlineList, "至少选择一个发送对象", MyEnum.ShowPosition.Bottom_Mid);
+                return;
+            }
+
+            //转换信息格式
+            byte[] arrMsg = Encoding.Default.GetBytes(txt_Sender.Text);
+
+            //遍历所有选中客户端并发送
+            foreach (var item in lb_OnlineList.SelectedItems)
+            {
+                //获取对应的Socket对象
+                Socket socket = socketClientList.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
+                socket?.Send(arrMsg);
+            }
+
+            txt_Sender.Clear();
+        }
+
+        /// <summary>
+        /// 全选
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Cb_All_CheckedChanged(object sender, EventArgs e)
+        {
+            //全选
+            if (cb_All.Checked)
+            {
+                for (int i = 0; i < lb_OnlineList.Items.Count; i++)
+                {
+                    lb_OnlineList.SetSelected(i, true);
+                }
+                return;
+            }
+            lb_OnlineList.ClearSelected();
+        }
+
+        /// <summary>
+        /// 监听消息框
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Txt_Sender_TextChanged(object sender, EventArgs e) => btn_Sender.Enabled = txt_Sender.Text?.Length > 0;
+
+        /// <summary>
+        /// 监听换行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Txt_Sender_KeyUp(object sender, KeyEventArgs e)
+        {
+            //Shift+Enter换行
+            //发送
+            if (!((e.Modifiers == Keys.Shift && e.KeyCode == Keys.Enter) || e.KeyCode != Keys.Enter))
+            {
+                //取消回车符
+                var str = txt_Sender.Text;
+                if (str.EndsWith(Environment.NewLine)) 
+                {
+                    txt_Sender.Text = str.Substring(0, str.Length - Environment.NewLine.Length);
+                    Btn_Sender_Click(null, null);
+                }
+            }
         }
     }
 }
