@@ -28,6 +28,7 @@ namespace SocketTask.Common
                 }), addtext);
                 return;
             }
+
             control.Text = addtext;
         }
 
@@ -71,11 +72,10 @@ namespace SocketTask.Common
                 {
                     textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{t}{Environment.NewLine}{Environment.NewLine}");
                 }), txt);
+                return;
             }
-            else
-            {
-                textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{txt}{Environment.NewLine}{Environment.NewLine}");
-            }
+            
+            textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{txt}{Environment.NewLine}{Environment.NewLine}");
         }
     }
 }

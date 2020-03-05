@@ -24,8 +24,8 @@ namespace SocketTask
 
         #region 全局变量
         private static Socket socket = null;   //服务端用于监听的Socket
-        private static readonly List<Socket> socketClientList = new List<Socket>();      //监听到的Socket集合
-        private static CancellationTokenSource tokenSource = null;     //服务任务取消信号
+        private static CancellationTokenSource CancellationTS_Server = new CancellationTokenSource();     //服务总任务取消信号
+        private static readonly Dictionary<Socket, CancellationTokenSource> socketClientList = new Dictionary<Socket, CancellationTokenSource>();   //客户端Socket与对应取消信号字典集合
         #endregion
 
         /// <summary>
@@ -84,8 +84,7 @@ namespace SocketTask
 
             //开启任务-监听
             //任务类型[LongRunning]
-            tokenSource = new CancellationTokenSource();
-            tokenSource.Token.Register(() =>
+            CancellationTS_Server.Token.Register(() =>
             {
                 if (socket == null)
                 {
@@ -96,13 +95,14 @@ namespace SocketTask
             //开启线程-监听对象端口
             Task.Run(() =>
             {
-                while (!tokenSource.IsCancellationRequested)
+                while (!CancellationTS_Server.IsCancellationRequested)
                 {
-                    //如果监听到一个客户端，则创建一个对应的新Socket
+                    //如果监听到一个客户端，则创建一个对应的新Socket以及对应取消信号
                     Socket socketClient = socket.Accept();
+                    CancellationTokenSource CancellationTS_Client = new CancellationTokenSource();
 
                     //将该对象存入字典集合
-                    socketClientList.Add(socketClient);
+                    socketClientList.Add(socketClient, CancellationTS_Client);
 
                     //显示连接信息
                     lb_OnlineList.RefreshListWithInvoke(socketClient.IPstr(), MyEnum.AddOrRemove.Add);
@@ -112,7 +112,7 @@ namespace SocketTask
                     {
                         Socket sclientobj = sc as Socket;
 
-                        while (!tokenSource.IsCancellationRequested)
+                        while (!socketClientList[sclientobj].IsCancellationRequested)
                         {
                             //定一个缓冲区-用于接收数据
                             byte[] arrMsgRec = new byte[Const.BufferByteSize];
@@ -149,9 +149,9 @@ namespace SocketTask
                                 break;
                             }
                         }
-                    }, socketClient);
+                    }, socketClient, CancellationTS_Client.Token);
                 }
-            }, tokenSource.Token);
+            }, CancellationTS_Server.Token);
 
             //按钮禁用
             btn_Start.Enabled = false;
@@ -200,7 +200,6 @@ namespace SocketTask
                 localIP = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily.ToString().Equals("InterNetwork")).FirstOrDefault();
                 txt_LocalIP.RefreshTextWithInvoke(localIP.ToString());
             });
-
         }
 
         /// <summary>
@@ -216,15 +215,21 @@ namespace SocketTask
                 return;
             }
 
-            //取消
-            tokenSource.Cancel();
+            //服务取消信号
+            CancellationTS_Server.Cancel();
+            
             //释放资源
             socket.Dispose();
             socket = null;
+            //释放已连接的socket资源
             foreach (var item in socketClientList)
             {
-                item?.Dispose();
+                //已连接的连接取消信号，Socket释放
+                item.Value?.Cancel();
+                item.Key?.Dispose();
             }
+            //清除ListBox
+            lb_OnlineList.Items.Clear();
 
             btn_Start.Enabled = true;
             txt_RecInfo.AddTextWithInvoke("+++++++++++++++++服务已关闭+++++++++++++++++");
@@ -256,7 +261,7 @@ namespace SocketTask
             foreach (var item in lb_OnlineList.SelectedItems)
             {
                 //获取对应的Socket对象
-                Socket socket = socketClientList.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
+                Socket socket = socketClientList.Keys.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
                 socket?.Send(arrMsg);
             }
 
@@ -307,6 +312,37 @@ namespace SocketTask
                     txt_Sender.Text = str.Substring(0, str.Length - Environment.NewLine.Length);
                     Btn_Sender_Click(null, null);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 断开客户端连接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_Broken_Click(object sender, EventArgs e)
+        {
+            if (lb_OnlineList.SelectedItems.Count < 1)  
+            {
+                this.Hint(lb_OnlineList, "请选择你要断开的连接", MyEnum.ShowPosition.Mid_Mid);
+                return;
+            }
+
+            //获取要断开Socket的集合
+            List<Socket> selectedSockets = socketClientList.Keys.Where(s => s.RemoteEndPoint != null && lb_OnlineList.SelectedItems.Contains(s.RemoteEndPoint.ToString())).ToList();
+
+            //断开连接
+            foreach (var item in selectedSockets)
+            {
+                //取消信号，移除字典与ListBox，断开连接，释放资源
+                socketClientList[item].Cancel();
+                socketClientList.Remove(item);
+                lb_OnlineList.Items.Remove(item.RemoteEndPoint.ToString());
+                txt_RecInfo.AddTextWithInvoke($"主动断开与{item.RemoteEndPoint}的连接");
+
+                item.Disconnect(true);
+                item.Dispose();
+
             }
         }
     }

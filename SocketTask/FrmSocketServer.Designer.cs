@@ -36,7 +36,7 @@
             this.lb_OnlineList = new System.Windows.Forms.ListBox();
             this.btn_OpenClient = new System.Windows.Forms.Button();
             this.btn_Sender = new System.Windows.Forms.Button();
-            this.btn_Broke = new System.Windows.Forms.Button();
+            this.btn_Close = new System.Windows.Forms.Button();
             this.btn_Start = new System.Windows.Forms.Button();
             this.txt_LocalPort = new System.Windows.Forms.TextBox();
             this.txt_PublicIP = new System.Windows.Forms.TextBox();
@@ -46,6 +46,7 @@
             this.lbl_LocalPort = new System.Windows.Forms.Label();
             this.lbl_LocalIP = new System.Windows.Forms.Label();
             this.cb_All = new System.Windows.Forms.CheckBox();
+            this.btn_Broken = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Lbl_FilePath
@@ -58,7 +59,7 @@
             // 
             // btn_SendFile
             // 
-            this.btn_SendFile.Location = new System.Drawing.Point(477, 434);
+            this.btn_SendFile.Location = new System.Drawing.Point(143, 475);
             this.btn_SendFile.Name = "btn_SendFile";
             this.btn_SendFile.Size = new System.Drawing.Size(75, 23);
             this.btn_SendFile.TabIndex = 26;
@@ -67,7 +68,7 @@
             // 
             // btn_ChooseFile
             // 
-            this.btn_ChooseFile.Location = new System.Drawing.Point(42, 434);
+            this.btn_ChooseFile.Location = new System.Drawing.Point(28, 475);
             this.btn_ChooseFile.Name = "btn_ChooseFile";
             this.btn_ChooseFile.Size = new System.Drawing.Size(75, 23);
             this.btn_ChooseFile.TabIndex = 25;
@@ -76,10 +77,10 @@
             // 
             // txt_Sender
             // 
-            this.txt_Sender.Location = new System.Drawing.Point(28, 212);
+            this.txt_Sender.Location = new System.Drawing.Point(28, 383);
             this.txt_Sender.Multiline = true;
             this.txt_Sender.Name = "txt_Sender";
-            this.txt_Sender.Size = new System.Drawing.Size(445, 166);
+            this.txt_Sender.Size = new System.Drawing.Size(445, 74);
             this.txt_Sender.TabIndex = 23;
             this.txt_Sender.TextChanged += new System.EventHandler(this.Txt_Sender_TextChanged);
             this.txt_Sender.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Txt_Sender_KeyUp);
@@ -91,7 +92,7 @@
             this.txt_RecInfo.Name = "txt_RecInfo";
             this.txt_RecInfo.ReadOnly = true;
             this.txt_RecInfo.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txt_RecInfo.Size = new System.Drawing.Size(445, 166);
+            this.txt_RecInfo.Size = new System.Drawing.Size(445, 317);
             this.txt_RecInfo.TabIndex = 24;
             // 
             // lb_OnlineList
@@ -106,7 +107,7 @@
             // 
             // btn_OpenClient
             // 
-            this.btn_OpenClient.Location = new System.Drawing.Point(666, 451);
+            this.btn_OpenClient.Location = new System.Drawing.Point(760, 454);
             this.btn_OpenClient.Name = "btn_OpenClient";
             this.btn_OpenClient.Size = new System.Drawing.Size(75, 23);
             this.btn_OpenClient.TabIndex = 20;
@@ -116,7 +117,7 @@
             // btn_Sender
             // 
             this.btn_Sender.Enabled = false;
-            this.btn_Sender.Location = new System.Drawing.Point(666, 395);
+            this.btn_Sender.Location = new System.Drawing.Point(397, 433);
             this.btn_Sender.Name = "btn_Sender";
             this.btn_Sender.Size = new System.Drawing.Size(75, 23);
             this.btn_Sender.TabIndex = 21;
@@ -124,19 +125,19 @@
             this.btn_Sender.UseVisualStyleBackColor = true;
             this.btn_Sender.Click += new System.EventHandler(this.Btn_Sender_Click);
             // 
-            // btn_Broke
+            // btn_Close
             // 
-            this.btn_Broke.Location = new System.Drawing.Point(666, 366);
-            this.btn_Broke.Name = "btn_Broke";
-            this.btn_Broke.Size = new System.Drawing.Size(75, 23);
-            this.btn_Broke.TabIndex = 19;
-            this.btn_Broke.Text = "关闭服务";
-            this.btn_Broke.UseVisualStyleBackColor = true;
-            this.btn_Broke.Click += new System.EventHandler(this.Btn_Broke_Click);
+            this.btn_Close.Location = new System.Drawing.Point(760, 369);
+            this.btn_Close.Name = "btn_Close";
+            this.btn_Close.Size = new System.Drawing.Size(75, 23);
+            this.btn_Close.TabIndex = 19;
+            this.btn_Close.Text = "关闭服务";
+            this.btn_Close.UseVisualStyleBackColor = true;
+            this.btn_Close.Click += new System.EventHandler(this.Btn_Broke_Click);
             // 
             // btn_Start
             // 
-            this.btn_Start.Location = new System.Drawing.Point(666, 337);
+            this.btn_Start.Location = new System.Drawing.Point(760, 340);
             this.btn_Start.Name = "btn_Start";
             this.btn_Start.Size = new System.Drawing.Size(75, 23);
             this.btn_Start.TabIndex = 18;
@@ -224,21 +225,31 @@
             this.cb_All.UseVisualStyleBackColor = false;
             this.cb_All.CheckedChanged += new System.EventHandler(this.Cb_All_CheckedChanged);
             // 
+            // btn_Broken
+            // 
+            this.btn_Broken.Location = new System.Drawing.Point(589, 308);
+            this.btn_Broken.Name = "btn_Broken";
+            this.btn_Broken.Size = new System.Drawing.Size(75, 23);
+            this.btn_Broken.TabIndex = 29;
+            this.btn_Broken.Text = "断开连接";
+            this.btn_Broken.UseVisualStyleBackColor = true;
+            this.btn_Broken.Click += new System.EventHandler(this.Btn_Broken_Click);
+            // 
             // FrmSocketServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(898, 521);
+            this.Controls.Add(this.btn_Broken);
             this.Controls.Add(this.cb_All);
             this.Controls.Add(this.Lbl_FilePath);
             this.Controls.Add(this.btn_SendFile);
             this.Controls.Add(this.btn_ChooseFile);
-            this.Controls.Add(this.txt_Sender);
             this.Controls.Add(this.txt_RecInfo);
             this.Controls.Add(this.lb_OnlineList);
             this.Controls.Add(this.btn_OpenClient);
             this.Controls.Add(this.btn_Sender);
-            this.Controls.Add(this.btn_Broke);
+            this.Controls.Add(this.btn_Close);
             this.Controls.Add(this.btn_Start);
             this.Controls.Add(this.txt_LocalPort);
             this.Controls.Add(this.txt_PublicIP);
@@ -247,6 +258,7 @@
             this.Controls.Add(this.lbl_PublicIP);
             this.Controls.Add(this.lbl_LocalPort);
             this.Controls.Add(this.lbl_LocalIP);
+            this.Controls.Add(this.txt_Sender);
             this.Name = "FrmSocketServer";
             this.Text = "FrmSocketServer";
             this.Shown += new System.EventHandler(this.FrmSocketServer_Shown);
@@ -265,7 +277,7 @@
         private System.Windows.Forms.ListBox lb_OnlineList;
         private System.Windows.Forms.Button btn_OpenClient;
         private System.Windows.Forms.Button btn_Sender;
-        private System.Windows.Forms.Button btn_Broke;
+        private System.Windows.Forms.Button btn_Close;
         private System.Windows.Forms.Button btn_Start;
         private System.Windows.Forms.TextBox txt_LocalPort;
         private System.Windows.Forms.TextBox txt_PublicIP;
@@ -275,5 +287,6 @@
         private System.Windows.Forms.Label lbl_LocalPort;
         private System.Windows.Forms.Label lbl_LocalIP;
         private System.Windows.Forms.CheckBox cb_All;
+        private System.Windows.Forms.Button btn_Broken;
     }
 }
