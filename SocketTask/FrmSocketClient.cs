@@ -7,9 +7,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SocketTask.Common;
+using Common;
 
 namespace SocketTask
 {
@@ -54,33 +55,80 @@ namespace SocketTask
                 return;
             }
 
+            if (socketClient == null)
+            {
+                socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            }
+
             //连接
             try
             {
                 //获取终结点
                 IPEndPoint iPEndPoint = new IPEndPoint(iPAddress, int.Parse(txt_ServerPort.Text));
 
-                txt_RecInfo.RefreshTextWithInvoke("连接中.....");
+                txt_RecInfo.AddTextWithInvoke("连接中.....");
                 socketClient.Connect(iPEndPoint);
             }
             catch (Exception ex)
             {
-                txt_RecInfo.RefreshTextWithInvoke($"连接失败，{ex.Message}");
-                socketClient.Close();
+                txt_RecInfo.AddTextWithInvoke($"连接失败，{ex.Message}");
                 return;
             }
 
             //连接成功
             if (socketClient.Connected)
             {
-                txt_RecInfo.RefreshTextWithInvoke("+++++++++++++++++连接成功+++++++++++++++++");
+                txt_RecInfo.AddTextWithInvoke("+++++++++++++++++连接成功+++++++++++++++++");
                 btn_Connect.Enabled = false;
 
+                //监听任务取消信息
+                CancellationTokenSource cancellationTS_Listening = new CancellationTokenSource();
+
                 //监听消息
-                Task.Factory.StartNew(sc =>
+                Task.Factory.StartNew(() =>
                 {
-                    Socket socket = sc as Socket;
-                }, socketClient);
+                    //数据缓冲区
+                    byte[] arrMsg = new byte[Const.BufferByteSize];
+
+                    //接受数据
+                    int len = -1;
+                    while (!cancellationTS_Listening.IsCancellationRequested)
+                    {
+                        try
+                        {
+                            len = socketClient.Receive(arrMsg);
+                        }
+                        catch (SocketException)
+                        {
+                            throw;
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                            MessageBox.Show("连接已断开");
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+
+                        if (len > 0)
+                        {
+                            //显示接受信息
+                            txt_RecInfo.AddTextWithInvoke($"来自{socketClient.IPstr()}的消息：{Encoding.Default.GetString(arrMsg)}");
+                        }
+                        else
+                        {
+                            //服务器关闭
+                            txt_RecInfo.AddTextWithInvoke("连接断开");
+                            //监听取消
+                            cancellationTS_Listening.Cancel();
+
+                            socketClient.Disconnect(true);
+                            socketClient.Dispose();
+                        }
+                    }
+
+                }, cancellationTS_Listening.Token);
             }
         }
     }

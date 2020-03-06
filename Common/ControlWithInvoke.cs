@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static SocketTask.Common.MyEnum;
+using static Common.MyEnum;
 
-namespace SocketTask.Common
+namespace Common
 {
     /// <summary>
     /// 刷新控件信息【跨线程】
@@ -38,7 +38,7 @@ namespace SocketTask.Common
         /// <param name="listBox"></param>
         /// <param name="item"></param>
         /// <param name="AddOrRmv"></param>
-        public static void RefreshListWithInvoke(this ListBox listBox,string item,AddOrRemove addOrRemove)
+        public static void RefreshListWithInvoke(this ListBox listBox, string item, AddOrRemove addOrRemove, Control control = null)
         {
             if (listBox.InvokeRequired)
             {
@@ -64,11 +64,11 @@ namespace SocketTask.Common
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="txt"></param>
-        public static void AddTextWithInvoke(this TextBox textBox,string txt)
+        public static void AddTextWithInvoke(this TextBox textBox, string txt, Control control = null)
         {
             if (textBox.InvokeRequired)
             {
-                textBox.Invoke(new Action<string>(t =>
+                (control ?? textBox).Invoke(new Action<string>(t =>
                 {
                     textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{t}{Environment.NewLine}{Environment.NewLine}");
                 }), txt);

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SocketTask
+namespace SocketServer
 {
     public partial class FrmSocketServer : Form
     {
@@ -156,7 +156,7 @@ namespace SocketTask
 
             //按钮禁用
             btn_Start.Enabled = false;
-                txt_RecInfo.AddTextWithInvoke($"+++++++++++++++++服务开启成功+++++++++++++++++");
+            txt_RecInfo.AddTextWithInvoke($"+++++++++++++++++服务开启成功+++++++++++++++++");
         }
 
         /// <summary>
@@ -350,24 +350,9 @@ namespace SocketTask
                 lb_OnlineList.RefreshListWithInvoke(item.RemoteEndPoint.ToString(), MyEnum.AddOrRemove.Remove);
                 txt_RecInfo.AddTextWithInvoke($"主动断开与{item.RemoteEndPoint}的连接");
 
-                //因为在同一个程序中  需要另起线程用于 客户端的操作
-                Task.Run(() =>
-                {
-                    item.Disconnect(true);
-                    item.Dispose();
-                });
+                item.Disconnect(true);
+                item.Dispose();
             }
-        }
-
-        /// <summary>
-        /// 打开客户端
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Btn_OpenClient_Click(object sender, EventArgs e)
-        {
-            FrmSocketClient client = new FrmSocketClient();
-            client.Show();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SocketTask
+﻿namespace SocketServer
 {
     partial class FrmSocketServer
     {
@@ -34,7 +34,6 @@
             this.txt_Sender = new System.Windows.Forms.TextBox();
             this.txt_RecInfo = new System.Windows.Forms.TextBox();
             this.lb_OnlineList = new System.Windows.Forms.ListBox();
-            this.btn_OpenClient = new System.Windows.Forms.Button();
             this.btn_Sender = new System.Windows.Forms.Button();
             this.btn_Close = new System.Windows.Forms.Button();
             this.btn_Start = new System.Windows.Forms.Button();
@@ -104,16 +103,6 @@
             this.lb_OnlineList.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lb_OnlineList.Size = new System.Drawing.Size(249, 100);
             this.lb_OnlineList.TabIndex = 22;
-            // 
-            // btn_OpenClient
-            // 
-            this.btn_OpenClient.Location = new System.Drawing.Point(760, 454);
-            this.btn_OpenClient.Name = "btn_OpenClient";
-            this.btn_OpenClient.Size = new System.Drawing.Size(75, 23);
-            this.btn_OpenClient.TabIndex = 20;
-            this.btn_OpenClient.Text = "打开客户端";
-            this.btn_OpenClient.UseVisualStyleBackColor = false;
-            this.btn_OpenClient.Click += new System.EventHandler(this.Btn_OpenClient_Click);
             // 
             // btn_Sender
             // 
@@ -248,7 +237,6 @@
             this.Controls.Add(this.btn_ChooseFile);
             this.Controls.Add(this.txt_RecInfo);
             this.Controls.Add(this.lb_OnlineList);
-            this.Controls.Add(this.btn_OpenClient);
             this.Controls.Add(this.btn_Sender);
             this.Controls.Add(this.btn_Close);
             this.Controls.Add(this.btn_Start);
@@ -276,7 +264,6 @@
         private System.Windows.Forms.TextBox txt_Sender;
         private System.Windows.Forms.TextBox txt_RecInfo;
         private System.Windows.Forms.ListBox lb_OnlineList;
-        private System.Windows.Forms.Button btn_OpenClient;
         private System.Windows.Forms.Button btn_Sender;
         private System.Windows.Forms.Button btn_Close;
         private System.Windows.Forms.Button btn_Start;

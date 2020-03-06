@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SocketTask.Common
+namespace Common
 {
     /// <summary>
     /// 消息框帮助类
