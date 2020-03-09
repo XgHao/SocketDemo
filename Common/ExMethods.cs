@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Common.MyEnum;
 
 namespace Common
 {
@@ -65,6 +67,60 @@ namespace Common
             res.Append(str.Substring(head));
 
             return res.ToString();
+        }
+
+        /// <summary>
+        /// 设置文本及颜色主题
+        /// </summary>
+        /// <param name="control"></param>
+        /// <param name="text"></param>
+        /// <param name=""></param>
+        public static void SetTextWithTheme(this Control control, string text, ThemeColor theme = ThemeColor.Default)
+        {
+            control.ForeColor = GetThemeColor(theme);
+            control.Text = text;
+        }
+
+        /// <summary>
+        /// 主题色
+        /// </summary>
+        /// <param name="color"></param>
+        /// <param name="theme"></param>
+        /// <returns></returns>
+        public static Color GetThemeColor(ThemeColor theme)
+        {
+            Color color;
+            switch (theme)
+            {
+                case ThemeColor.Primary:
+                    color = Color.FromArgb(0, 123, 255);
+                    break;
+                case ThemeColor.Secondary:
+                    color = Color.FromArgb(108, 117, 125);
+                    break;
+                case ThemeColor.Success:
+                    color = Color.FromArgb(40, 167, 69);
+                    break;
+                case ThemeColor.Danger:
+                    color = Color.FromArgb(220, 53, 69);
+                    break;
+                case ThemeColor.Warning:
+                    color = Color.FromArgb(245, 127, 23);
+                    break;
+                case ThemeColor.Info:
+                    color = Color.FromArgb(23, 162, 184);
+                    break;
+                case ThemeColor.Light:
+                    color = Color.FromArgb(248, 249, 250);
+                    break;
+                case ThemeColor.Dark:
+                    color = Color.FromArgb(52, 58, 64);
+                    break;
+                default:
+                    color = Color.Black;
+                    break;
+            }
+            return color;
         }
     }
 }

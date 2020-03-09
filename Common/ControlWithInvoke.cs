@@ -18,14 +18,29 @@ namespace Common
         /// </summary>
         /// <param name="control"></param>
         /// <param name="addtext"></param>
-        public static void RefreshTextWithInvoke(this Control control,string addtext)
+        /// <param name="invoke"></param>
+        public static void RefreshTextWithInvoke(this Control control, string addtext, InvokeType invoke = InvokeType.Invoke)
         {
+            //是否需要调用Invoke方法
             if (control.InvokeRequired)
             {
-                control.Invoke(new Action<string>(txt =>
+                switch (invoke)
                 {
-                    control.Text = txt;
-                }), addtext);
+                    //同步委托
+                    case InvokeType.Invoke:
+                        control.Invoke(new Action<string>(txt =>
+                        {
+                            control.Text = txt;
+                        }), addtext);
+                        break;
+                    //异步委托
+                    case InvokeType.BeginInvoke:
+                        control.BeginInvoke(new Action<string>(txt =>
+                        {
+                            control.Text = txt;
+                        }), addtext);
+                        break;
+                }
                 return;
             }
 
@@ -33,22 +48,37 @@ namespace Common
         }
 
         /// <summary>
-        /// 刷新ListBox中的Item 
+        /// 刷新ListBox中的Items
         /// </summary>
         /// <param name="listBox"></param>
         /// <param name="item"></param>
-        /// <param name="AddOrRmv"></param>
-        public static void RefreshListWithInvoke(this ListBox listBox, string item, AddOrRemove addOrRemove, Control control = null)
+        /// <param name="addOrRemove"></param>
+        /// <param name="invoke"></param>
+        public static void RefreshListWithInvoke(this ListBox listBox, string item, AddOrRemove addOrRemove, InvokeType invoke = InvokeType.Invoke)
         {
             if (listBox.InvokeRequired)
             {
-                listBox.Invoke(new Action<string, AddOrRemove>((s, f) =>
+                switch (invoke)
                 {
-                    if (addOrRemove == AddOrRemove.Add && !listBox.Items.Contains(s))
-                        listBox.Items.Add(s);
-                    else if (addOrRemove == AddOrRemove.Remove && listBox.Items.Contains(s))
-                        listBox.Items.Remove(s);
-                }), item, addOrRemove);
+                    case InvokeType.Invoke:
+                        listBox.Invoke(new Action<string, AddOrRemove>((s, f) =>
+                        {
+                            if (addOrRemove == AddOrRemove.Add && !listBox.Items.Contains(s))
+                                listBox.Items.Add(s);
+                            else if (addOrRemove == AddOrRemove.Remove && listBox.Items.Contains(s))
+                                listBox.Items.Remove(s);
+                        }), item, addOrRemove);
+                        break;
+                    case InvokeType.BeginInvoke:
+                        listBox.BeginInvoke(new Action<string, AddOrRemove>((s, f) =>
+                        {
+                            if (addOrRemove == AddOrRemove.Add && !listBox.Items.Contains(s))
+                                listBox.Items.Add(s);
+                            else if (addOrRemove == AddOrRemove.Remove && listBox.Items.Contains(s))
+                                listBox.Items.Remove(s);
+                        }), item, addOrRemove);
+                        break;
+                }
                 return;
             }
 
@@ -58,20 +88,31 @@ namespace Common
                 listBox.Items.Remove(item);
         }
 
-
         /// <summary>
         /// 添加文本
         /// </summary>
         /// <param name="textBox"></param>
         /// <param name="txt"></param>
-        public static void AddTextWithInvoke(this TextBox textBox, string txt, Control control = null)
+        /// <param name="invoke"></param>
+        public static void AddTextWithInvoke(this TextBox textBox, string txt, InvokeType invoke = InvokeType.Invoke)
         {
             if (textBox.InvokeRequired)
             {
-                (control ?? textBox).Invoke(new Action<string>(t =>
+                switch (invoke)
                 {
-                    textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{t}{Environment.NewLine}{Environment.NewLine}");
-                }), txt);
+                    case InvokeType.Invoke:
+                        textBox.Invoke(new Action<string>(t =>
+                        {
+                            textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{t}{Environment.NewLine}{Environment.NewLine}");
+                        }), txt);
+                        break;
+                    case InvokeType.BeginInvoke:
+                        textBox.BeginInvoke(new Action<string>(t =>
+                        {
+                            textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{t}{Environment.NewLine}{Environment.NewLine}");
+                        }), txt);
+                        break;
+                }
                 return;
             }
             

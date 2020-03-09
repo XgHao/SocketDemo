@@ -1,4 +1,6 @@
-﻿namespace SocketTask
+﻿using Common;
+
+namespace SocketTask
 {
     partial class FrmSocketServer
     {
@@ -28,7 +30,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.Lbl_FilePath = new System.Windows.Forms.Label();
             this.btn_SendFile = new System.Windows.Forms.Button();
             this.btn_ChooseFile = new System.Windows.Forms.Button();
             this.txt_Sender = new System.Windows.Forms.TextBox();
@@ -47,19 +48,12 @@
             this.lbl_LocalIP = new System.Windows.Forms.Label();
             this.cb_All = new System.Windows.Forms.CheckBox();
             this.btn_Broken = new System.Windows.Forms.Button();
+            this.lbl_FilePath = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // Lbl_FilePath
-            // 
-            this.Lbl_FilePath.AutoSize = true;
-            this.Lbl_FilePath.Location = new System.Drawing.Point(123, 439);
-            this.Lbl_FilePath.Name = "Lbl_FilePath";
-            this.Lbl_FilePath.Size = new System.Drawing.Size(0, 12);
-            this.Lbl_FilePath.TabIndex = 27;
             // 
             // btn_SendFile
             // 
-            this.btn_SendFile.Location = new System.Drawing.Point(143, 475);
+            this.btn_SendFile.Location = new System.Drawing.Point(28, 492);
             this.btn_SendFile.Name = "btn_SendFile";
             this.btn_SendFile.Size = new System.Drawing.Size(75, 23);
             this.btn_SendFile.TabIndex = 26;
@@ -68,12 +62,13 @@
             // 
             // btn_ChooseFile
             // 
-            this.btn_ChooseFile.Location = new System.Drawing.Point(28, 475);
+            this.btn_ChooseFile.Location = new System.Drawing.Point(28, 463);
             this.btn_ChooseFile.Name = "btn_ChooseFile";
             this.btn_ChooseFile.Size = new System.Drawing.Size(75, 23);
             this.btn_ChooseFile.TabIndex = 25;
             this.btn_ChooseFile.Text = "选择文件";
             this.btn_ChooseFile.UseVisualStyleBackColor = true;
+            this.btn_ChooseFile.Click += new System.EventHandler(this.Btn_ChooseFile_Click);
             // 
             // txt_Sender
             // 
@@ -236,14 +231,25 @@
             this.btn_Broken.UseVisualStyleBackColor = true;
             this.btn_Broken.Click += new System.EventHandler(this.Btn_Broken_Click);
             // 
+            // lbl_FilePath
+            // 
+            this.lbl_FilePath.AutoSize = true;
+            this.lbl_FilePath.Font = new System.Drawing.Font("黑体", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.lbl_FilePath.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(127)))), ((int)(((byte)(23)))));
+            this.lbl_FilePath.Location = new System.Drawing.Point(104, 474);
+            this.lbl_FilePath.Name = "lbl_FilePath";
+            this.lbl_FilePath.Size = new System.Drawing.Size(19, 11);
+            this.lbl_FilePath.TabIndex = 30;
+            this.lbl_FilePath.Text = "22";
+            // 
             // FrmSocketServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(898, 521);
+            this.Controls.Add(this.lbl_FilePath);
             this.Controls.Add(this.btn_Broken);
             this.Controls.Add(this.cb_All);
-            this.Controls.Add(this.Lbl_FilePath);
             this.Controls.Add(this.btn_SendFile);
             this.Controls.Add(this.btn_ChooseFile);
             this.Controls.Add(this.txt_RecInfo);
@@ -270,7 +276,6 @@
 
         #endregion
 
-        private System.Windows.Forms.Label Lbl_FilePath;
         private System.Windows.Forms.Button btn_SendFile;
         private System.Windows.Forms.Button btn_ChooseFile;
         private System.Windows.Forms.TextBox txt_Sender;
@@ -289,5 +294,6 @@
         private System.Windows.Forms.Label lbl_LocalIP;
         private System.Windows.Forms.CheckBox cb_All;
         private System.Windows.Forms.Button btn_Broken;
+        private System.Windows.Forms.Label lbl_FilePath;
     }
 }

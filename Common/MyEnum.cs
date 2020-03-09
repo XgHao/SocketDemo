@@ -8,6 +8,9 @@ namespace Common
 {
     public static class MyEnum
     {
+        /// <summary>
+        /// 添加或者移除
+        /// </summary>
         public enum AddOrRemove
         {
             /// <summary>
@@ -18,6 +21,64 @@ namespace Common
             /// 移除
             /// </summary>
             Remove
+        }
+
+        /// <summary>
+        /// 指定Invoke是异步还是同步
+        /// </summary>
+        public enum InvokeType
+        {
+            /// <summary>
+            /// 同步
+            /// </summary>
+            Invoke,
+            /// <summary>
+            /// 异步
+            /// </summary>
+            BeginInvoke
+        }
+
+        /// <summary>
+        /// 主题色
+        /// </summary>
+        public enum ThemeColor
+        {
+            /// <summary>
+            /// 主要
+            /// </summary>
+            Primary,
+            /// <summary>
+            /// 次要
+            /// </summary>
+            Secondary,
+            /// <summary>
+            /// 成功
+            /// </summary>
+            Success,
+            /// <summary>
+            /// 危险
+            /// </summary>
+            Danger,
+            /// <summary>
+            /// 警告
+            /// </summary>
+            Warning,
+            /// <summary>
+            /// 信息
+            /// </summary>
+            Info,
+            /// <summary>
+            /// 亮色
+            /// </summary>
+            Light,
+            /// <summary>
+            /// 暗色
+            /// </summary>
+            Dark,
+            /// <summary>
+            /// 默认
+            /// </summary>
+            Default
         }
 
         /// <summary>

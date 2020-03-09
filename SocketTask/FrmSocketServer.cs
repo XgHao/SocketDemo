@@ -2,15 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Common.MyEnum;
 
 namespace SocketTask
 {
@@ -19,6 +20,8 @@ namespace SocketTask
         public FrmSocketServer()
         {
             InitializeComponent();
+
+            lbl_FilePath.Text = $"文件大小需在{Const.FileSize / 1024 / 1024}M之内";
         }
 
 
@@ -26,6 +29,8 @@ namespace SocketTask
         private static Socket socket = null;   //服务端用于监听的Socket
         private static CancellationTokenSource CancellationTS_Server = null;     //服务总任务取消信号
         private static readonly Dictionary<Socket, CancellationTokenSource> socketClientList = new Dictionary<Socket, CancellationTokenSource>();   //客户端Socket与对应取消信号字典集合
+
+        private FileInfo file = null;   //发送文件信息
         #endregion
 
         /// <summary>
@@ -45,12 +50,12 @@ namespace SocketTask
             //验证IP地址和端口号
             if (!IPAddress.TryParse(txt_LocalIP.Text.Trim(), out IPAddress iPAddress))
             {
-                this.Hint(txt_LocalIP, "请输入正确的IP地址", MyEnum.ShowPosition.Mid_Right);
+                this.Hint(txt_LocalIP, "请输入正确的IP地址", ShowPosition.Mid_Right);
                 return;
             }
             if (!int.TryParse(txt_LocalPort.Text.Trim(), out int port))
             {   
-                this.Hint(txt_LocalPort, "请输入正确的端口号", MyEnum.ShowPosition.Mid_Right);
+                this.Hint(txt_LocalPort, "请输入正确的端口号", ShowPosition.Mid_Right);
                 return;
             }
 
@@ -106,7 +111,7 @@ namespace SocketTask
                     socketClientList.Add(socketClient, CancellationTS_Client);
 
                     //显示连接信息
-                    lb_OnlineList.RefreshListWithInvoke(socketClient.IPstr(), MyEnum.AddOrRemove.Add);
+                    lb_OnlineList.RefreshListWithInvoke(socketClient.IPstr(), AddOrRemove.Add);
                     txt_RecInfo.AddTextWithInvoke($"{socketClient.IPstr()}上线");
                     //开启新的线程，监听已连接的通讯
                     Task.Factory.StartNew(sc =>
@@ -127,7 +132,7 @@ namespace SocketTask
                             }
                             catch (SocketException)
                             {
-                                lb_OnlineList.RefreshListWithInvoke(sclientobj.IPstr(), MyEnum.AddOrRemove.Remove);
+                                lb_OnlineList.RefreshListWithInvoke(sclientobj.IPstr(), AddOrRemove.Remove);
                                 txt_RecInfo.AddTextWithInvoke($"{sclientobj.IPstr()}离线");
                                 break;
                             }
@@ -145,7 +150,7 @@ namespace SocketTask
                             else
                             {
                                 //客户端离线
-                                lb_OnlineList.RefreshListWithInvoke(sclientobj.RemoteEndPoint.ToString(), MyEnum.AddOrRemove.Remove);
+                                lb_OnlineList.RefreshListWithInvoke(sclientobj.RemoteEndPoint.ToString(), AddOrRemove.Remove);
                                 txt_RecInfo.AddTextWithInvoke($"{sclientobj.IPstr()}离线");
                                 break;
                             }
@@ -253,13 +258,13 @@ namespace SocketTask
         {
             if (txt_Sender.Text.Length <= 0) 
             {
-                this.Hint(txt_Sender, "消息不能为空", MyEnum.ShowPosition.Mid_Mid);
+                this.Hint(txt_Sender, "消息不能为空", ShowPosition.Mid_Mid);
                 return;
             }
 
             if (lb_OnlineList.SelectedItems.Count == 0) 
             {
-                this.Hint(lb_OnlineList, "至少选择一个发送对象", MyEnum.ShowPosition.Bottom_Mid);
+                this.Hint(lb_OnlineList, "至少选择一个发送对象", ShowPosition.Bottom_Mid);
                 return;
             }
 
@@ -333,7 +338,7 @@ namespace SocketTask
         {
             if (lb_OnlineList.SelectedItems.Count < 1)  
             {
-                this.Hint(lb_OnlineList, "请选择你要断开的连接", MyEnum.ShowPosition.Mid_Mid);
+                this.Hint(lb_OnlineList, "请选择你要断开的连接", ShowPosition.Mid_Mid);
                 return;
             }
 
@@ -347,7 +352,7 @@ namespace SocketTask
                 //取消信号，移除字典与ListBox，断开连接，释放资源
                 socketClientList[item].Cancel();
                 socketClientList.Remove(item);
-                lb_OnlineList.RefreshListWithInvoke(item.RemoteEndPoint.ToString(), MyEnum.AddOrRemove.Remove);
+                lb_OnlineList.RefreshListWithInvoke(item.RemoteEndPoint.ToString(), AddOrRemove.Remove);
                 txt_RecInfo.AddTextWithInvoke($"主动断开与{item.RemoteEndPoint}的连接");
 
                 //因为在同一个程序中  需要另起线程用于 客户端的操作
@@ -368,6 +373,43 @@ namespace SocketTask
         {
             FrmSocketClient client = new FrmSocketClient();
             client.Show();
+        }
+
+        /// <summary>
+        /// 选择文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_ChooseFile_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog
+            {
+                //默认启动目录为“最近文件”
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
+                Filter = "所有文件(*.*)|*.*"
+            };
+
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    file = new FileInfo(fileDialog.FileName);
+                    //文件超限
+                    if (file.Length > Const.FileSize) 
+                    {
+                        file = null;
+                        lbl_FilePath.SetTextWithTheme("文件超限", ThemeColor.Warning);
+                        return;
+                    }
+                    lbl_FilePath.SetTextWithTheme(file.FullName, ThemeColor.Success);
+                }
+                catch (Exception ex)
+                {
+                    lbl_FilePath.SetTextWithTheme($"出错了，{ex.Message}", ThemeColor.Danger);
+                    file = null;
+                    return;
+                }
+            }
         }
     }
 }
