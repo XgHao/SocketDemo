@@ -122,5 +122,65 @@ namespace Common
             }
             return color;
         }
+
+        /// <summary>
+        /// 获取字节序列
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static byte[] GetArrayByte(this string text,Format format = Format.Default)
+        {
+            byte[] arr = null;
+            switch (format)
+            {
+                case Format.UTF8:
+                    arr = Encoding.UTF8.GetBytes(text);
+                    break;
+                case Format.ASCII:
+                    arr = Encoding.ASCII.GetBytes(text);
+                    break;
+                case Format.Default:
+                    arr = Encoding.Default.GetBytes(text);
+                    break;
+                case Format.Unicode:
+                    arr = Encoding.Unicode.GetBytes(text);
+                    break;
+                default:
+                    arr = Encoding.Default.GetBytes(text);
+                    break;
+            }
+            return arr;
+        }
+
+        /// <summary>
+        /// 获取文本
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static string GetArrayText(this byte[] bytes, Format format = Format.Default)
+        {
+            string arr = null;
+            switch (format)
+            {
+                case Format.UTF8:
+                    arr = Encoding.UTF8.GetString(bytes);
+                    break;
+                case Format.ASCII:
+                    arr = Encoding.ASCII.GetString(bytes);
+                    break;
+                case Format.Default:
+                    arr = Encoding.Default.GetString(bytes);
+                    break;
+                case Format.Unicode:
+                    arr = Encoding.Unicode.GetString(bytes);
+                    break;
+                default:
+                    arr = Encoding.Default.GetString(bytes);
+                    break;
+            }
+            return arr;
+        }
     }
 }

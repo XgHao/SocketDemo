@@ -88,8 +88,10 @@
     <Compile Include="FrmSocketServer.Designer.cs">
       <DependentUpon>FrmSocketServer.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helper\FormatHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Helper\WebHelper.cs" />
     <EmbeddedResource Include="FrmSocketClient.resx">
       <DependentUpon>FrmSocketClient.cs</DependentUpon>
     </EmbeddedResource>

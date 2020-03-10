@@ -59,6 +59,7 @@ namespace SocketTask
             this.btn_SendFile.TabIndex = 26;
             this.btn_SendFile.Text = "发送文件";
             this.btn_SendFile.UseVisualStyleBackColor = true;
+            this.btn_SendFile.Click += new System.EventHandler(this.Btn_SendFile_Click);
             // 
             // btn_ChooseFile
             // 
@@ -238,9 +239,8 @@ namespace SocketTask
             this.lbl_FilePath.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(245)))), ((int)(((byte)(127)))), ((int)(((byte)(23)))));
             this.lbl_FilePath.Location = new System.Drawing.Point(104, 474);
             this.lbl_FilePath.Name = "lbl_FilePath";
-            this.lbl_FilePath.Size = new System.Drawing.Size(19, 11);
+            this.lbl_FilePath.Size = new System.Drawing.Size(0, 11);
             this.lbl_FilePath.TabIndex = 30;
-            this.lbl_FilePath.Text = "22";
             // 
             // FrmSocketServer
             // 

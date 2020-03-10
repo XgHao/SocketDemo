@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Exception;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +37,37 @@ namespace Common
             /// 异步
             /// </summary>
             BeginInvoke
+        }
+
+        /// <summary>
+        /// 消息流头部
+        /// 用于区分接受类型
+        /// </summary>
+        public enum MsgStreamHead
+        {
+            /// <summary>
+            /// 文本
+            /// </summary>
+            Text,
+            /// <summary>
+            /// 图片
+            /// </summary>
+            Picture,
+            /// <summary>
+            /// 文件
+            /// </summary>
+            File,
+        }
+
+        /// <summary>
+        /// 转换格式
+        /// </summary>
+        public enum Format
+        {
+            UTF8,
+            ASCII,
+            Default,
+            Unicode
         }
 
         /// <summary>
@@ -122,6 +154,23 @@ namespace Common
             /// 底右
             /// </summary>
             Bottom_Right
+        }
+
+        /// <summary>
+        /// ID获取对应枚举
+        /// 没有则返回null
+        /// </summary>
+        /// <typeparam name="T">枚举类型</typeparam>
+        /// <param name="id"></param>
+        /// <exception cref="EnumTransFailedException"></exception>
+        /// <returns></returns>
+        public static T GetEnumByID<T>(int id) where T : Enum
+        {
+            if (Enum.IsDefined(typeof(T), id))
+            {
+                return (T)Enum.ToObject(typeof(T), id);
+            }
+            throw new EnumTransFailedException("转换失败");
         }
     }
 }

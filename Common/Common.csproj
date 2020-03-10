@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Const.cs" />
     <Compile Include="ControlWithInvoke.cs" />
+    <Compile Include="Exception\EnumTransFailedException.cs" />
     <Compile Include="ExMethods.cs" />
     <Compile Include="MessageBoxHelper.cs" />
     <Compile Include="MyEnum.cs" />

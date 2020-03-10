@@ -1,4 +1,5 @@
 ﻿using Common;
+using SocketTask.Helper;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -23,7 +24,6 @@ namespace SocketTask
 
             lbl_FilePath.Text = $"文件大小需在{Const.FileSize / 1024 / 1024}M之内";
         }
-
 
         #region 全局变量
         private static Socket socket = null;   //服务端用于监听的Socket
@@ -172,38 +172,35 @@ namespace SocketTask
         private void FrmSocketServer_Shown(object sender, EventArgs e)
         {
             IPAddress publicIP = null, localIP = null;
-            
+
+            CancellationTokenSource cancellationTS_GetIP = new CancellationTokenSource();
             //获取公网IP
             Task.Run(() =>
             {
-                Stream stream = null;
-                StreamReader streamReader = null;
-                try
+                while (!cancellationTS_GetIP.IsCancellationRequested) 
                 {
-                    stream = WebRequest.Create("https://www.ipip5.com/").GetResponse().GetResponseStream();
-                    streamReader = new StreamReader(stream, Encoding.UTF8);
-                    var str = streamReader.ReadToEnd();
-                    int first = str.IndexOf("<span class=\"c-ip\">") + 19;
-                    int last = str.IndexOf("</span>", first);
-                    var ip = str.Substring(first, last - first);
-                    publicIP = IPAddress.Parse(ip);
-                    txt_PublicIP.RefreshTextWithInvoke(publicIP.ToString());
+                    txt_PublicIP.RefreshTextWithInvoke("正在努力获取中...");
+                    try
+                    {
+                        publicIP = WebHelper.GetPublicIP();
+                        if (publicIP != null)
+                        {
+                            txt_PublicIP.RefreshTextWithInvoke(publicIP.ToString());
+                            cancellationTS_GetIP.Cancel();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        txt_PublicIP.RefreshTextWithInvoke($"获取失败，{Const.RequestTime.TotalSeconds}s后重试。{ex.Message}");
+                        Thread.Sleep(Const.RequestTime);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    txt_PublicIP.RefreshTextWithInvoke($"获取失败,{ex.Message}");
-                }
-                finally
-                {
-                    streamReader?.Dispose();
-                    stream?.Dispose();
-                }
-            });
+            }, cancellationTS_GetIP.Token);
 
             //获取内网IP
             Task.Run(() =>
             {
-                localIP = Dns.GetHostAddresses(Dns.GetHostName()).Where(ip => ip.AddressFamily.ToString().Equals("InterNetwork")).FirstOrDefault();
+                localIP = WebHelper.GetLocalIP();
                 txt_LocalIP.RefreshTextWithInvoke(localIP.ToString());
             });
         }
@@ -268,16 +265,19 @@ namespace SocketTask
                 return;
             }
 
-            //转换信息格式
-            byte[] arrMsg = Encoding.Default.GetBytes(txt_Sender.Text);
-
-            //遍历所有选中客户端并发送
-            foreach (var item in lb_OnlineList.SelectedItems)
+            string msg = txt_Sender.Text;
+            //发送消息
+            Task.Run(() =>
             {
-                //获取对应的Socket对象
-                Socket socket = socketClientList.Keys.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
-                socket?.Send(arrMsg);
-            }
+                try
+                {
+                    SendStream(FormatHelper.TextToStream(msg));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"出错了，{ex.Message}");
+                }
+            });
 
             txt_Sender.Clear();
         }
@@ -306,7 +306,10 @@ namespace SocketTask
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Txt_Sender_TextChanged(object sender, EventArgs e) => btn_Sender.Enabled = txt_Sender.Text?.Length > 0;
+        private void Txt_Sender_TextChanged(object sender, EventArgs e)
+        {
+            btn_Sender.Enabled = txt_Sender.Text?.Length > 0;
+        }
 
         /// <summary>
         /// 监听换行
@@ -388,7 +391,7 @@ namespace SocketTask
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
                 Filter = "所有文件(*.*)|*.*"
             };
-
+                
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -401,7 +404,7 @@ namespace SocketTask
                         lbl_FilePath.SetTextWithTheme("文件超限", ThemeColor.Warning);
                         return;
                     }
-                    lbl_FilePath.SetTextWithTheme(file.FullName, ThemeColor.Success);
+                    lbl_FilePath.SetTextWithTheme(file.FullName, ThemeColor.Info);
                 }
                 catch (Exception ex)
                 {
@@ -409,6 +412,63 @@ namespace SocketTask
                     file = null;
                     return;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 发送文件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_SendFile_Click(object sender, EventArgs e)
+        {
+            //刷新对象
+            file.Refresh();
+            //未选择有效文件
+            if (file == null && MessageBox.Show("还未选择有效文件，是否现在选择？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
+            {
+                Btn_ChooseFile_Click(sender, e);
+                return;
+            }
+            //文件不存在
+            if (!file.Exists && MessageBox.Show("选择的文件不存在，是否现在重新选择？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes)
+            {
+                //选择文件
+                Btn_ChooseFile_Click(sender, e);
+                return;
+            }
+            if (lb_OnlineList.SelectedItems.Count == 0)
+            {
+                this.Hint(lb_OnlineList, "至少选择一个发送对象", ShowPosition.Bottom_Mid);
+                return;
+            }
+
+            //发送文件
+            try
+            {
+                SendStream(FormatHelper.ToFileStream(file));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"出错了，{ex.Message}");
+            }
+
+            lbl_FilePath.SetTextWithTheme("发送成功", ThemeColor.Success);
+            file = null;
+        }
+
+        /// <summary>
+        /// 发送字节流
+        /// </summary>
+        /// <param name="bytes"></param>
+        private void SendStream(byte[] bytes)
+        {
+            //遍历所有选中客户端并发送
+            foreach (var item in lb_OnlineList.SelectedItems)
+            {
+                //获取对应的Socket对象
+                Socket socket = socketClientList.Keys.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
+                socket?.Send(bytes);
             }
         }
     }

@@ -40,15 +40,16 @@ namespace Common
 
         /// <summary>
         /// 发送文件大小限制
+        /// +1个字节，为消息流头部
         /// </summary>
         public static long FileSize
         {
             get
             {
                 if (long.TryParse(ConfigurationManager.AppSettings["FileSize"], out long size))
-                    return size * 1024 * 1024;
+                    return (size * 1024 * 1024) + 1;
                 else
-                    return 3 * 1024 * 1024;
+                    return (3 * 1024 * 1024) + 1;
             }
         }
     }
