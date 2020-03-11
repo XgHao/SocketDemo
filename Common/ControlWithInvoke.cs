@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -89,6 +90,51 @@ namespace Common
         }
 
         /// <summary>
+        /// 获取选中的集合
+        /// </summary>
+        /// <param name="listBox"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static List<string> GetSelectedItemsWithInvoke(this ListBox listBox, InvokeType type = InvokeType.Invoke)
+        {
+            List<string> clients = new List<string>();
+            
+            if (listBox.InvokeRequired)
+            {
+                switch (type)
+                {
+                    case InvokeType.Invoke:
+                        listBox.Invoke(new Action(() =>
+                        {
+                            foreach (var item in listBox.SelectedItems)
+                            {
+                                clients.Add(item.ToString());
+                            }
+                        }));
+                        break;
+                    case InvokeType.BeginInvoke:
+                        listBox.BeginInvoke(new Action(() =>
+                        {
+                            foreach (var item in listBox.SelectedItems)
+                            {
+                                clients.Add(item.ToString());
+                            }
+                        }));
+                        break;
+                }
+            }
+            else
+            {
+                foreach (var item in listBox.SelectedItems)
+                {
+                    clients.Add(item.ToString());
+                }
+            }
+
+            return clients;
+        }
+
+        /// <summary>
         /// 添加文本
         /// </summary>
         /// <param name="textBox"></param>
@@ -117,6 +163,41 @@ namespace Common
             }
             
             textBox.AppendText($"[{DateTime.Now}]{Environment.NewLine}{txt}{Environment.NewLine}{Environment.NewLine}");
+        }
+
+        /// <summary>
+        /// 获取选中项，返回string
+        /// </summary>
+        /// <param name="comboBox"></param>
+        /// <param name="invoke"></param>
+        /// <returns></returns>
+        public static string GetSelectedItemWithInvoke(this ComboBox comboBox, InvokeType invoke = InvokeType.Invoke)
+        {
+            string obj = string.Empty;
+            if (comboBox.InvokeRequired)
+            {
+                switch (invoke)
+                {
+                    case InvokeType.Invoke:
+                        comboBox.Invoke(new Action(() =>
+                        {
+                            obj = comboBox.SelectedItem.ToString();
+                        }));
+                        break;
+                    case InvokeType.BeginInvoke:
+                        comboBox.BeginInvoke(new Action(() =>
+                        {
+                            obj = comboBox.SelectedItem.ToString();
+                        }));
+                        break;
+                }
+            }
+            else
+            {
+                obj = comboBox.SelectedItem.ToString();
+            }
+
+            return obj;
         }
     }
 }

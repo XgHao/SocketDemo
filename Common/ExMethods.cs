@@ -182,5 +182,25 @@ namespace Common
             }
             return arr;
         }
+
+        /// <summary>
+        /// 去除末尾空值
+        /// </summary>
+        /// <param name="arr"></param>
+        /// <returns></returns>
+        public static byte[] RemoveNull(this byte[] arr)
+        {
+            
+            //从末尾开始去除连续的空值
+            //len>1 忽略头部信息
+            int len;
+            for (len = arr.Length - 1; len > 1; len--)
+            {
+                if (arr[len] == 0 && arr[len - 1] != 0)
+                    break;
+            }
+
+            return arr.Take(len).ToArray();
+        }
     }
 }

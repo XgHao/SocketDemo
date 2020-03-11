@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -11,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Common;
+using SocketTask.Helper;
+using static Common.MyEnum;
 
 namespace SocketTask
 {
@@ -23,6 +26,9 @@ namespace SocketTask
         public FrmSocketClient()
         {
             InitializeComponent();
+
+            //初始化控件
+            cmb_Encoding.DataSource = Enum.GetNames(typeof(Format));
         }
 
         /// <summary>
@@ -45,7 +51,7 @@ namespace SocketTask
         {
             if (!IPAddress.TryParse(txt_ServerIP.Text.Trim(), out IPAddress iPAddress)) 
             {
-                this.Hint(txt_ServerIP, "请输入正确的IP地址", MyEnum.ShowPosition.Mid_Right);
+                this.Hint(txt_ServerIP, "请输入正确的IP地址", ShowPosition.Mid_Right);
                 return;
             }
 
@@ -87,13 +93,13 @@ namespace SocketTask
                 //监听消息
                 Task.Factory.StartNew(() =>
                 {
-                    //数据缓冲区
-                    byte[] arrMsg = new byte[Const.BufferByteSize];
-
                     //接受数据
                     int len = -1;
                     while (!cancellationTS_Listening.IsCancellationRequested)
                     {
+                        //数据缓冲区
+                        byte[] arrMsg = new byte[Const.BufferByteSize];
+
                         try
                         {
                             len = socketClient.Receive(arrMsg);
@@ -113,8 +119,37 @@ namespace SocketTask
 
                         if (len > 0)
                         {
-                            //显示接受信息
-                            txt_RecInfo.AddTextWithInvoke($"来自{socketClient.IPstr()}的消息：{Encoding.Default.GetString(arrMsg)}");
+                            Format format = GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke());
+                            var context = FormatHelper.StreamToText(arrMsg.RemoveNull(), format);
+                            string msg = string.Empty;
+                            if (context is string)
+                            {
+                                msg = context.ToString();
+                            }
+                            else if (context is byte[])
+                            {
+                                //保存文件
+                                if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
+                                {
+                                    //保存文件
+                                    SaveFileDialog saveFileDialog = new SaveFileDialog();
+                                    if (saveFileDialog.ShowDialog() == DialogResult.OK) 
+                                    {
+                                        string path = saveFileDialog.FileName;
+                                        using (FileStream fs = new FileStream(path, FileMode.Create)) 
+                                        {
+                                            fs.Write(context as byte[], 0, (context as byte[]).Length);
+                                            msg = $"接收到文件，保存在{path}";
+                                        }
+                                    }
+                                    else
+                                    {
+                                        msg = $"接收到文件，未保存";
+                                    }
+                                }
+                            }
+
+                            txt_RecInfo.AddTextWithInvoke(msg);
                         }
                         else
                         {
@@ -130,6 +165,19 @@ namespace SocketTask
 
                 }, cancellationTS_Listening.Token);
             }
+        }
+
+        /// <summary>
+        /// 发送消息
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_Sender_Click(object sender, EventArgs e)
+        {
+            if (txt_Sender.Text.Length == 0)
+                return;
+            byte[] arrMsg = FormatHelper.TextToStream(txt_Sender.Text, GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke()));
+            socketClient.Send(arrMsg);
         }
     }
 }

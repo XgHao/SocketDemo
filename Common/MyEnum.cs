@@ -64,9 +64,9 @@ namespace Common
         /// </summary>
         public enum Format
         {
+            Default,
             UTF8,
             ASCII,
-            Default,
             Unicode
         }
 
@@ -158,19 +158,34 @@ namespace Common
 
         /// <summary>
         /// ID获取对应枚举
-        /// 没有则返回null
         /// </summary>
         /// <typeparam name="T">枚举类型</typeparam>
         /// <param name="id"></param>
-        /// <exception cref="EnumTransFailedException"></exception>
+        /// <exception cref="ErrorMsgException"></exception>
         /// <returns></returns>
-        public static T GetEnumByID<T>(int id) where T : Enum
+        public static T GetEnumByIDorName<T>(int id) where T : struct, Enum
         {
-            if (Enum.IsDefined(typeof(T), id))
+            if (Enum.TryParse(id.ToString(), out T type))
             {
-                return (T)Enum.ToObject(typeof(T), id);
+                return type;
             }
-            throw new EnumTransFailedException("转换失败");
+            throw new ErrorMsgException("获取枚举格式失败");
+        }
+
+        /// <summary>
+        /// 名称获取对应枚举
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <exception cref="ErrorMsgException"></exception>
+        /// <returns></returns>
+        public static T GetEnumByIDorName<T>(string value) where T : struct, Enum
+        {
+            if (Enum.TryParse(value, out T type)) 
+            {
+                return type;
+            }
+            throw new ErrorMsgException("获取枚举格式失败");
         }
     }
 }

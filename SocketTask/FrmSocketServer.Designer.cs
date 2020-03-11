@@ -49,6 +49,7 @@ namespace SocketTask
             this.cb_All = new System.Windows.Forms.CheckBox();
             this.btn_Broken = new System.Windows.Forms.Button();
             this.lbl_FilePath = new System.Windows.Forms.Label();
+            this.cmb_Encoding = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // btn_SendFile
@@ -242,11 +243,21 @@ namespace SocketTask
             this.lbl_FilePath.Size = new System.Drawing.Size(0, 11);
             this.lbl_FilePath.TabIndex = 30;
             // 
+            // cmb_Encoding
+            // 
+            this.cmb_Encoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_Encoding.FormattingEnabled = true;
+            this.cmb_Encoding.Location = new System.Drawing.Point(270, 435);
+            this.cmb_Encoding.Name = "cmb_Encoding";
+            this.cmb_Encoding.Size = new System.Drawing.Size(121, 20);
+            this.cmb_Encoding.TabIndex = 31;
+            // 
             // FrmSocketServer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(898, 521);
+            this.Controls.Add(this.cmb_Encoding);
             this.Controls.Add(this.lbl_FilePath);
             this.Controls.Add(this.btn_Broken);
             this.Controls.Add(this.cb_All);
@@ -295,5 +306,6 @@ namespace SocketTask
         private System.Windows.Forms.CheckBox cb_All;
         private System.Windows.Forms.Button btn_Broken;
         private System.Windows.Forms.Label lbl_FilePath;
+        private System.Windows.Forms.ComboBox cmb_Encoding;
     }
 }

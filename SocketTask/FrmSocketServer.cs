@@ -22,7 +22,9 @@ namespace SocketTask
         {
             InitializeComponent();
 
+            //控件初始化
             lbl_FilePath.Text = $"文件大小需在{Const.FileSize / 1024 / 1024}M之内";
+            cmb_Encoding.DataSource = Enum.GetNames(typeof(Format));
         }
 
         #region 全局变量
@@ -145,7 +147,9 @@ namespace SocketTask
                             if (len > 0)
                             {
                                 //显示接收数据
-                                txt_RecInfo.AddTextWithInvoke($"来自{sclientobj.IPstr()}的消息：{Encoding.Default.GetString(arrMsgRec, 0, len)}");
+                                object msg = FormatHelper.StreamToText(arrMsgRec.RemoveNull(), GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke()));
+                                msg = msg is string ? msg.ToString() : "收到文件，暂不支持";
+                                txt_RecInfo.AddTextWithInvoke($"来自{sclientobj.IPstr()}的消息：{msg}");
                             }
                             else
                             {
@@ -271,7 +275,8 @@ namespace SocketTask
             {
                 try
                 {
-                    SendStream(FormatHelper.TextToStream(msg));
+                    var clients = lb_OnlineList.GetSelectedItemsWithInvoke();
+                    SendStream(FormatHelper.TextToStream(msg), clients);
                 }
                 catch (Exception ex)
                 {
@@ -446,7 +451,7 @@ namespace SocketTask
             //发送文件
             try
             {
-                SendStream(FormatHelper.ToFileStream(file));
+                SendStream(FormatHelper.ToFileStream(file), lb_OnlineList.GetSelectedItemsWithInvoke());
             }
             catch (Exception ex)
             {
@@ -461,13 +466,13 @@ namespace SocketTask
         /// 发送字节流
         /// </summary>
         /// <param name="bytes"></param>
-        private void SendStream(byte[] bytes)
+        private void SendStream(byte[] bytes, List<string> clients)
         {
             //遍历所有选中客户端并发送
-            foreach (var item in lb_OnlineList.SelectedItems)
+            foreach (var item in clients)
             {
                 //获取对应的Socket对象
-                Socket socket = socketClientList.Keys.Where(s => s.RemoteEndPoint.ToString().Equals(item.ToString())).FirstOrDefault();
+                Socket socket = socketClientList.Keys.Where(s => s.RemoteEndPoint.ToString().Equals(item)).FirstOrDefault();
                 socket?.Send(bytes);
             }
         }

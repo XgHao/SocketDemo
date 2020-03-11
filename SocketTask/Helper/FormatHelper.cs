@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Exception;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +38,7 @@ namespace SocketTask.Helper
                 throw ex;
             }
 
-            return stream;
+            return stream.RemoveNull();
         }
 
         /// <summary>
@@ -46,15 +47,55 @@ namespace SocketTask.Helper
         /// <param name="stream"></param>
         /// <param name="format"></param>
         /// <returns></returns>
-        public static string StreamToText(byte[] stream, Format format = Format.Default)
+        public static object StreamToText(byte[] stream, Format format = Format.Default)
         {
-            //1.获取头部
+            //1.获取头部,主体
             int head = stream[0];
+            byte[] body = stream.Skip(1).ToArray();
 
             //2.获取数据类型
-            var type = GetEnumByID<MsgStreamHead>(head);
+            MsgStreamHead type;
+            try
+            {
+                type = GetEnumByIDorName<MsgStreamHead>(head);
+            }
+            catch (ErrorMsgException)
+            {
+                return "出错，接收失败";
+            }
 
-            return stream.GetArrayText(format);
+            //3.根据头部类型判断操作
+            object obj = string.Empty;
+            switch (type)
+            {
+                case MsgStreamHead.Text:
+                    switch (format)
+                    {
+                        case Format.UTF8:
+                            obj = Encoding.UTF8.GetString(body);
+                            break;
+                        case Format.ASCII:
+                            obj = Encoding.ASCII.GetString(body);
+                            break;
+                        case Format.Default:
+                            obj = Encoding.Default.GetString(body);
+                            break;
+                        case Format.Unicode:
+                            obj = Encoding.Unicode.GetString(body);
+                            break;
+                    }
+                    break;
+                case MsgStreamHead.Picture:
+                    obj = "【收到一张表情，该版本暂不支持】";
+                    break;
+                case MsgStreamHead.File:
+                    obj = body;
+                    break;
+                default:
+                    break;
+            }
+
+            return obj;
         }
 
         /// <summary>

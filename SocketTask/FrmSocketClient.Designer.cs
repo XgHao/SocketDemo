@@ -37,6 +37,7 @@
             this.txt_ServerIP = new System.Windows.Forms.TextBox();
             this.Lbl_ServerPort = new System.Windows.Forms.Label();
             this.Lbl_ServerIP = new System.Windows.Forms.Label();
+            this.cmb_Encoding = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // txt_Sender
@@ -65,6 +66,7 @@
             this.btn_Sender.TabIndex = 30;
             this.btn_Sender.Text = "发送消息";
             this.btn_Sender.UseVisualStyleBackColor = true;
+            this.btn_Sender.Click += new System.EventHandler(this.Btn_Sender_Click);
             // 
             // btn_Broke
             // 
@@ -120,11 +122,21 @@
             this.Lbl_ServerIP.TabIndex = 27;
             this.Lbl_ServerIP.Text = "服务器IP：";
             // 
+            // cmb_Encoding
+            // 
+            this.cmb_Encoding.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmb_Encoding.FormattingEnabled = true;
+            this.cmb_Encoding.Location = new System.Drawing.Point(48, 421);
+            this.cmb_Encoding.Name = "cmb_Encoding";
+            this.cmb_Encoding.Size = new System.Drawing.Size(121, 20);
+            this.cmb_Encoding.TabIndex = 35;
+            // 
             // FrmSocketClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(905, 494);
+            this.Controls.Add(this.cmb_Encoding);
             this.Controls.Add(this.txt_Sender);
             this.Controls.Add(this.txt_RecInfo);
             this.Controls.Add(this.btn_Sender);
@@ -153,5 +165,6 @@
         private System.Windows.Forms.TextBox txt_ServerIP;
         private System.Windows.Forms.Label Lbl_ServerPort;
         private System.Windows.Forms.Label Lbl_ServerIP;
+        private System.Windows.Forms.ComboBox cmb_Encoding;
     }
 }
