@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -198,6 +200,42 @@ namespace Common
             }
 
             return obj;
+        }
+
+        /// <summary>
+        /// 在当前Form中显示保存文件对话框
+        /// </summary>
+        /// <param name="form"></param>
+        /// <param name="arrFileBytes">文件字节流</param>
+        /// <returns>结果</returns>
+        public static string ShowSaveFileDialogWithInvoke(this Form form, byte[] arrFileBytes)
+        {
+            return form.Invoke(new Func<byte[], string>(file =>
+            {
+                //保存文件
+                var dia = new SaveFileDialog();
+                if (dia.ShowDialog() == DialogResult.OK)
+                {
+                    //保存路径
+                    string path = dia.FileName;
+                    FileStream fileStream = null;
+                    try
+                    {
+                        fileStream = new FileStream(path, FileMode.Create);
+                        fileStream.Write(file, 0, file.Length);
+                        return $"接收到文件，保存在{path}目录下";
+                    }
+                    catch (System.Exception ex)
+                    {
+                        return $"文件保存失败，错误原因{ex.Message}";
+                    }
+                    finally
+                    {
+                        fileStream?.Dispose();
+                    }
+                }
+                return $"保存文件操作取消";
+            }), arrFileBytes).ToString();
         }
     }
 }

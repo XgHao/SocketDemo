@@ -76,6 +76,7 @@
             this.btn_Broke.TabIndex = 31;
             this.btn_Broke.Text = "断开服务器";
             this.btn_Broke.UseVisualStyleBackColor = true;
+            this.btn_Broke.Click += new System.EventHandler(this.Btn_Broke_Click);
             // 
             // btn_Connect
             // 

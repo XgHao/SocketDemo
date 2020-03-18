@@ -428,7 +428,7 @@ namespace SocketTask
         private void Btn_SendFile_Click(object sender, EventArgs e)
         {
             //刷新对象
-            file.Refresh();
+            file?.Refresh();
             //未选择有效文件
             if (file == null && MessageBox.Show("还未选择有效文件，是否现在选择？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
             {
@@ -452,14 +452,17 @@ namespace SocketTask
             try
             {
                 SendStream(FormatHelper.ToFileStream(file), lb_OnlineList.GetSelectedItemsWithInvoke());
+                lbl_FilePath.SetTextWithTheme("发送成功", ThemeColor.Success);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"出错了，{ex.Message}");
+                lbl_FilePath.SetTextWithTheme("发送失败", ThemeColor.Danger);
             }
-
-            lbl_FilePath.SetTextWithTheme("发送成功", ThemeColor.Success);
-            file = null;
+            finally
+            {
+                file = null;
+            }
         }
 
         /// <summary>

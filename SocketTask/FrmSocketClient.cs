@@ -128,27 +128,14 @@ namespace SocketTask
                             }
                             else if (context is byte[])
                             {
+                                msg = $"接收到文件，未保存";
                                 //保存文件
                                 if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
                                 {
                                     //保存文件
-                                    SaveFileDialog saveFileDialog = new SaveFileDialog();
-                                    if (saveFileDialog.ShowDialog() == DialogResult.OK) 
-                                    {
-                                        string path = saveFileDialog.FileName;
-                                        using (FileStream fs = new FileStream(path, FileMode.Create)) 
-                                        {
-                                            fs.Write(context as byte[], 0, (context as byte[]).Length);
-                                            msg = $"接收到文件，保存在{path}";
-                                        }
-                                    }
-                                    else
-                                    {
-                                        msg = $"接收到文件，未保存";
-                                    }
+                                    msg = this.ShowSaveFileDialogWithInvoke(context as byte[]);
                                 }
                             }
-
                             txt_RecInfo.AddTextWithInvoke(msg);
                         }
                         else
@@ -178,6 +165,17 @@ namespace SocketTask
                 return;
             byte[] arrMsg = FormatHelper.TextToStream(txt_Sender.Text, GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke()));
             socketClient.Send(arrMsg);
+        }
+
+        /// <summary>
+        /// 断开连接
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Btn_Broke_Click(object sender, EventArgs e)
+        {
+            //断开连接
+            socketClient.Disconnect(true);
         }
     }
 }

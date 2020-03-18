@@ -107,13 +107,13 @@ namespace SocketTask.Helper
         {
             //文件流
             FileStream fileStream = null;
-            byte[] filebytes = null;
+            //容器
+            byte[] arrFileSend = new byte[Const.FileSize];
 
             try
             {
                 fileStream = new FileStream(file.FullName, FileMode.Open);
-                //容器
-                byte[] arrFileSend = new byte[Const.FileSize];
+                byte[] filebytes = new byte[Const.FileSize - 1];
                 //读取文件byte[]
                 fileStream.Read(filebytes, 0, (int)fileStream.Length);
                 //头部
@@ -130,7 +130,7 @@ namespace SocketTask.Helper
                 fileStream?.Dispose();
             }
 
-            return filebytes;
+            return arrFileSend;
         }
     }
 }
