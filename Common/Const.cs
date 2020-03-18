@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Common
 {
+    /// <summary>
+    /// 常量
+    /// </summary>
     public static class Const
     {
         /// <summary>
@@ -40,16 +43,34 @@ namespace Common
 
         /// <summary>
         /// 发送文件大小限制
-        /// +1个字节，为消息流头部
         /// </summary>
-        public static long FileSize
+        public static long MaxFileSize
         {
             get
             {
+                int cnt = StreamHeadSize - 2;
+                for (int i = 0; i < cnt; i++)
+                {
+
+                }
                 if (long.TryParse(ConfigurationManager.AppSettings["FileSize"], out long size))
-                    return (size * 1024 * 1024) + 1;
+                    return size * 1024 * 1024;
                 else
-                    return (3 * 1024 * 1024) + 1;
+                    return 3 * 1024 * 1024;
+            }
+        }
+
+        /// <summary>
+        /// 字节流头部大小
+        /// </summary>
+        public static int StreamHeadSize
+        {
+            get
+            {
+                if (int.TryParse(ConfigurationManager.AppSettings["StreamHeadSize"], out int head))
+                    return head;
+                else
+                    return 10;
             }
         }
     }

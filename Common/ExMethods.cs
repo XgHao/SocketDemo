@@ -190,7 +190,6 @@ namespace Common
         /// <returns></returns>
         public static byte[] RemoveNull(this byte[] arr)
         {
-            
             //从末尾开始去除连续的空值
             //len>1 忽略头部信息
             int len;
@@ -201,6 +200,26 @@ namespace Common
             }
 
             return arr.Take(len).ToArray();
+        }
+
+        /// <summary>
+        /// 设置筛选
+        /// </summary>
+        /// <param name="fileDialog"></param>
+        /// <param name="filters">筛选集合</param>
+        public static void SetFilter(this FileDialog fileDialog, string[] filters = null)
+        {
+            if (filters == null)
+            {
+                filters = Enum.GetNames(typeof(Extensions));
+            }
+
+            StringBuilder DialogFilter = new StringBuilder();
+            foreach (var item in filters)
+            {
+                DialogFilter.Append($"{item} files (*.{item})|*.{item}|");
+            }
+            fileDialog.Filter = DialogFilter.ToString().TrimEnd('|');
         }
     }
 }

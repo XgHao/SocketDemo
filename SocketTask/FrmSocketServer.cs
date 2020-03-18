@@ -23,7 +23,7 @@ namespace SocketTask
             InitializeComponent();
 
             //控件初始化
-            lbl_FilePath.Text = $"文件大小需在{Const.FileSize / 1024 / 1024}M之内";
+            lbl_FilePath.Text = $"文件大小需在{Const.MaxFileSize / 1024 / 1024}M之内";
             cmb_Encoding.DataSource = Enum.GetNames(typeof(Format));
         }
 
@@ -394,8 +394,9 @@ namespace SocketTask
             {
                 //默认启动目录为“最近文件”
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                Filter = "所有文件(*.*)|*.*"
             };
+            //设置筛选
+            fileDialog.SetFilter();
                 
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -403,7 +404,7 @@ namespace SocketTask
                 {
                     file = new FileInfo(fileDialog.FileName);
                     //文件超限
-                    if (file.Length > Const.FileSize) 
+                    if (file.Length > Const.MaxFileSize) 
                     {
                         file = null;
                         lbl_FilePath.SetTextWithTheme("文件超限", ThemeColor.Warning);

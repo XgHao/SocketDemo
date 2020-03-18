@@ -119,24 +119,24 @@ namespace SocketTask
 
                         if (len > 0)
                         {
-                            Format format = GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke());
-                            var context = FormatHelper.StreamToText(arrMsg.RemoveNull(), format);
-                            string msg = string.Empty;
-                            if (context is string)
-                            {
-                                msg = context.ToString();
-                            }
-                            else if (context is byte[])
-                            {
-                                msg = $"接收到文件，未保存";
-                                //保存文件
-                                if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
-                                {
-                                    //保存文件
-                                    msg = this.ShowSaveFileDialogWithInvoke(context as byte[]);
-                                }
-                            }
-                            txt_RecInfo.AddTextWithInvoke(msg);
+                            //Format format = GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke());
+                            //var context = FormatHelper.StreamToText(arrMsg.RemoveNull(), format);
+                            //string msg = string.Empty;
+                            //if (context is string)
+                            //{
+                            //    msg = context.ToString();
+                            //}
+                            //else if (context is byte[])
+                            //{
+                            //    msg = $"接收到文件，未保存";
+                            //    //保存文件
+                            //    if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
+                            //    {
+                            //        //保存文件
+                            //        msg = this.ShowSaveFileDialogWithInvoke(context as byte[]);
+                            //    }
+                            //}
+                            //txt_RecInfo.AddTextWithInvoke(msg);
                         }
                         else
                         {

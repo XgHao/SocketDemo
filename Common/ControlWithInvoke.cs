@@ -210,10 +210,18 @@ namespace Common
         /// <returns>结果</returns>
         public static string ShowSaveFileDialogWithInvoke(this Form form, byte[] arrFileBytes)
         {
+            //文件类型
+            var ext = GetEnumByIDorName<Extensions>(arrFileBytes[1]).ToString();
+
             return form.Invoke(new Func<byte[], string>(file =>
             {
                 //保存文件
-                var dia = new SaveFileDialog();
+                var dia = new SaveFileDialog()
+                {
+                    AddExtension = true,
+                };
+                //添加文件类型-后缀名
+                dia.SetFilter(new string[] { ext });
                 if (dia.ShowDialog() == DialogResult.OK)
                 {
                     //保存路径
@@ -235,7 +243,7 @@ namespace Common
                     }
                 }
                 return $"保存文件操作取消";
-            }), arrFileBytes).ToString();
+            }), arrFileBytes.Skip(Const.StreamHeadSize).ToArray()).ToString();
         }
     }
 }

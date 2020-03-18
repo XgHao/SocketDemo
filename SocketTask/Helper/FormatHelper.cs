@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,14 +24,22 @@ namespace SocketTask.Helper
         /// <returns>byte数组</returns>
         public static byte[] TextToStream(string text, Format format = Format.Default)
         {
-            byte[] body = text.GetArrayByte(format); 
-            byte[] stream = new byte[Const.BufferByteSize];
-            //头部-文本形式
-            stream[0] = (int)MsgStreamHead.Text;
-            //拼接
+            //总容器：正文+头部
+            byte[] stream = new byte[Const.BufferByteSize + Const.StreamHeadSize];
+            //正文
+            byte[] body = text.GetArrayByte();
+            //头部
+            byte[] head = new byte[Const.StreamHeadSize];
+
             try
             {
-                Array.Copy(body, 0, stream, 1, body.Length);
+                //头部-文本形式
+                head[0] = (int)MsgStreamHead.Text;
+
+                //拼接-头部
+                Array.Copy(head, 0, stream, 0, head.Length);
+                //拼接-正文
+                Array.Copy(body, 0, stream, head.Length, body.Length);
             }
             //内容内容超限，抛出异常
             catch (Exception ex)
@@ -43,21 +52,22 @@ namespace SocketTask.Helper
 
         /// <summary>
         /// 消息流转换为字符串
+        /// 返回byte[]，则表示是文件
         /// </summary>
         /// <param name="stream"></param>
         /// <param name="format"></param>
         /// <returns></returns>
         public static object StreamToText(byte[] stream, Format format = Format.Default)
         {
-            //1.获取头部,主体
-            int head = stream[0];
-            byte[] body = stream.Skip(1).ToArray();
+            //1.获取主体
+            byte[] body = stream.Skip(Const.StreamHeadSize).ToArray();
 
             //2.获取数据类型
             MsgStreamHead type;
             try
             {
-                type = GetEnumByIDorName<MsgStreamHead>(head);
+                //根据头部信息获取消息类型
+                type = GetEnumByIDorName<MsgStreamHead>(stream[0]);
             }
             catch (ErrorMsgException)
             {
@@ -89,7 +99,8 @@ namespace SocketTask.Helper
                     obj = "【收到一张表情，该版本暂不支持】";
                     break;
                 case MsgStreamHead.File:
-                    obj = body;
+                    //返回所有信息
+                    obj = stream;
                     break;
                 default:
                     break;
@@ -108,18 +119,25 @@ namespace SocketTask.Helper
             //文件流
             FileStream fileStream = null;
             //容器
-            byte[] arrFileSend = new byte[Const.FileSize];
+            byte[] stream = new byte[Const.StreamHeadSize + Const.MaxFileSize];
+            //头部
+            byte[] head = new byte[Const.StreamHeadSize];
+            //文件流大小限制
+            byte[] filebytes = new byte[Const.MaxFileSize];
 
             try
             {
+                //根据文件，生成对应流
                 fileStream = new FileStream(file.FullName, FileMode.Open);
-                byte[] filebytes = new byte[Const.FileSize - 1];
+                
                 //读取文件byte[]
                 fileStream.Read(filebytes, 0, (int)fileStream.Length);
                 //头部
-                arrFileSend[0] = (int)MsgStreamHead.File;
+                head[0] = (byte)MsgStreamHead.File; //类型
+                head[1] = (byte)GetEnumByIDorName<Extensions>(file.Extension.TrimStart('.'));   //格式
                 //拼接
-                Array.Copy(filebytes, 0, arrFileSend, 1, filebytes.Length);
+                Array.Copy(head, 0, stream, 0, head.Length);
+                Array.Copy(filebytes, 0, stream, Const.StreamHeadSize, fileStream.Length);
             }
             catch (Exception ex)
             {
@@ -130,7 +148,27 @@ namespace SocketTask.Helper
                 fileStream?.Dispose();
             }
 
-            return arrFileSend;
+            return stream;
+        }
+
+
+        /// <summary>
+        /// 文件字节流长度写入头部
+        /// </summary>
+        /// <param name="arrSource"></param>
+        /// <param name="len"></param>
+        public static void WriteLenth(this byte[] arrSource, int len)
+        {
+            if (len > 99999999) 
+            {
+                throw new Exception("文件超限");
+            }
+            //长度最长为99999999
+            char[] chars = len.ToString("00000000").ToCharArray();
+            for (int i = 2; i < chars.Length+2; i++)
+            {
+                arrSource[i] = (byte)chars[i - 2];
+            }
         }
     }
 }
