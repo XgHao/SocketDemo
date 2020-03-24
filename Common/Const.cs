@@ -20,10 +20,7 @@ namespace Common
         {
             get
             {
-                if (int.TryParse(ConfigurationManager.AppSettings["BufferByteSize"], out int cnt))
-                    return cnt * 1024 * 1024;
-                else
-                    return 2 * 1024 * 1024;
+                return MaxFileSize + StreamHeadSize;
             }
         }
 

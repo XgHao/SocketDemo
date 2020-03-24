@@ -119,7 +119,7 @@ namespace SocketTask.Helper
             //文件流
             FileStream fileStream = null;
             //容器
-            byte[] stream = new byte[Const.StreamHeadSize + Const.MaxFileSize];
+            byte[] stream = new byte[Const.BufferByteSize];
             //头部
             byte[] head = new byte[Const.StreamHeadSize];
             //文件流大小限制
@@ -149,26 +149,6 @@ namespace SocketTask.Helper
             }
 
             return stream;
-        }
-
-
-        /// <summary>
-        /// 文件字节流长度写入头部
-        /// </summary>
-        /// <param name="arrSource"></param>
-        /// <param name="len"></param>
-        public static void WriteLenth(this byte[] arrSource, int len)
-        {
-            if (len > 99999999) 
-            {
-                throw new Exception("文件超限");
-            }
-            //长度最长为99999999
-            char[] chars = len.ToString("00000000").ToCharArray();
-            for (int i = 2; i < chars.Length+2; i++)
-            {
-                arrSource[i] = (byte)chars[i - 2];
-            }
         }
     }
 }

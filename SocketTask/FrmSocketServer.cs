@@ -366,7 +366,7 @@ namespace SocketTask
                 //因为在同一个程序中  需要另起线程用于 客户端的操作
                 Task.Run(() =>
                 {
-                    item.Disconnect(true);
+                    item.Disconnect(false);
                     item.Dispose();
                 });
             }

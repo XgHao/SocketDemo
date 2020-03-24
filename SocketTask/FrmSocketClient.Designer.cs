@@ -149,6 +149,7 @@
             this.Controls.Add(this.Lbl_ServerIP);
             this.Name = "FrmSocketClient";
             this.Text = "FrmSocketClient";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrmSocketClient_FormClosed);
             this.Shown += new System.EventHandler(this.FrmSocketClient_Shown);
             this.ResumeLayout(false);
             this.PerformLayout();

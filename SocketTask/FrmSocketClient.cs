@@ -21,6 +21,8 @@ namespace SocketTask
     {
         #region 全局变量
         Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //监听任务取消信息
+        CancellationTokenSource cancellationTS_Listening = null;
         #endregion
 
         public FrmSocketClient()
@@ -49,15 +51,10 @@ namespace SocketTask
         /// <param name="e"></param>
         private void Btn_Connect_Click(object sender, EventArgs e)
         {
+            cancellationTS_Listening = new CancellationTokenSource();
             if (!IPAddress.TryParse(txt_ServerIP.Text.Trim(), out IPAddress iPAddress)) 
             {
                 this.Hint(txt_ServerIP, "请输入正确的IP地址", ShowPosition.Mid_Right);
-                return;
-            }
-
-            if (socketClient.Connected)  
-            {
-                MessageBox.Show("连接已存在");
                 return;
             }
 
@@ -66,6 +63,12 @@ namespace SocketTask
                 socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             }
 
+            if (socketClient.Connected)  
+            {
+                MessageBox.Show("连接已存在");
+                return;
+            }
+            
             //连接
             try
             {
@@ -87,9 +90,7 @@ namespace SocketTask
                 txt_RecInfo.AddTextWithInvoke("+++++++++++++++++连接成功+++++++++++++++++");
                 btn_Connect.Enabled = false;
 
-                //监听任务取消信息
-                CancellationTokenSource cancellationTS_Listening = new CancellationTokenSource();
-
+                
                 //监听消息
                 Task.Factory.StartNew(() =>
                 {
@@ -119,25 +120,30 @@ namespace SocketTask
 
                         if (len > 0)
                         {
-                            //Format format = GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke());
-                            //var context = FormatHelper.StreamToText(arrMsg.RemoveNull(), format);
-                            //string msg = string.Empty;
-                            //if (context is string)
-                            //{
-                            //    msg = context.ToString();
-                            //}
-                            //else if (context is byte[])
-                            //{
-                            //    msg = $"接收到文件，未保存";
-                            //    //保存文件
-                            //    if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) 
-                            //    {
-                            //        //保存文件
-                            //        msg = this.ShowSaveFileDialogWithInvoke(context as byte[]);
-                            //    }
-                            //}
-                            //txt_RecInfo.AddTextWithInvoke(msg);
-                        }
+                            Format format = GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke());
+                            var context = FormatHelper.StreamToText(arrMsg.RemoveNull(), format);
+                            string msg = string.Empty;
+                            if (context is string)
+                            {
+                                msg = context.ToString();
+                            }
+                            else if (context is byte[])
+                            {
+                                msg = $"接收到文件，未保存";
+                                //保存文件
+                                if (MessageBox.Show("接收到文件，是否保存？", "文件保存", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                                {
+                                    //保存文件
+                                    msg = this.ShowSaveFileDialogWithInvoke(context as byte[]);
+                                }
+                                //反馈给服务端发送结果信息
+                                Task.Factory.StartNew(m =>
+                                {
+                                    socketClient.Send(FormatHelper.TextToStream(m.ToString(), GetEnumByIDorName<Format>(cmb_Encoding.GetSelectedItemWithInvoke())));
+                                }, $"发送成功，对方【{msg}】");
+                            }
+                            txt_RecInfo.AddTextWithInvoke(msg);
+;                        }
                         else
                         {
                             //服务器关闭
@@ -145,7 +151,8 @@ namespace SocketTask
                             //监听取消
                             cancellationTS_Listening.Cancel();
 
-                            socketClient.Disconnect(true);
+                            socketClient.Shutdown(SocketShutdown.Both);
+                            socketClient.Disconnect(false);
                             socketClient.Dispose();
                         }
                     }
@@ -175,7 +182,24 @@ namespace SocketTask
         private void Btn_Broke_Click(object sender, EventArgs e)
         {
             //断开连接
-            socketClient.Disconnect(true);
+            cancellationTS_Listening.Cancel();
+            Task.Run(() =>
+            {
+                socketClient.Disconnect(false);
+                socketClient.Dispose();
+                socketClient = null;
+            });
+            btn_Connect.Enabled = true;
+        }
+
+        /// <summary>
+        /// 客户端关闭时，发送断开
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FrmSocketClient_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Btn_Broke_Click(sender, null);
         }
     }
 }
